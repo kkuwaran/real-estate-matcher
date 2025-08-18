@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Ignore ChromaDB local database
+chromadb_data/
+
+# ...
+.env
+
+# Virtual environments
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
