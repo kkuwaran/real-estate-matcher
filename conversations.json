@@ -1,0 +1,65 @@
+[
+    {
+        "conversation_id": 1,
+        "messages": [
+            {"role": "agent", "text": "How big do you want your house to be?"},
+            {"role": "buyer", "text": "A comfortable three-bedroom house with a spacious kitchen and a cozy living room."},
+            {"role": "agent", "text": "What are 3 most important things for you in choosing this property?"},
+            {"role": "buyer", "text": "A quiet neighborhood, good local schools, and convenient shopping options."},
+            {"role": "agent", "text": "Which amenities would you like?"},
+            {"role": "buyer", "text": "A backyard for gardening, a two-car garage, and a modern, energy-efficient heating system."},
+            {"role": "agent", "text": "Which transportation options are important to you?"},
+            {"role": "buyer", "text": "Easy access to a reliable bus line, proximity to a major highway, and bike-friendly roads."},
+            {"role": "agent", "text": "How urban do you want your neighborhood to be?"},
+            {"role": "buyer", "text": "A balance between suburban tranquility and access to urban amenities like restaurants and theaters."}
+        ]
+    },
+    {
+        "conversation_id": 2,
+        "messages": [
+            {"role": "agent", "text": "Hello! What kind of property are you looking for today?"},
+            {"role": "buyer", "text": "I'm looking for a spacious suburban home for my family."},
+            {"role": "agent", "text": "Great! How many bedrooms and bathrooms do you need?"},
+            {"role": "buyer", "text": "At least 4 bedrooms and 3 bathrooms."},
+            {"role": "agent", "text": "Are there any specific amenities you want in the house?"},
+            {"role": "buyer", "text": "A large backyard, a garage for two cars, and a modern kitchen would be ideal."},
+            {"role": "agent", "text": "What about the neighborhood? Any preferences?"},
+            {"role": "buyer", "text": "A safe, family-friendly area with good schools nearby."},
+            {"role": "agent", "text": "Do you have a budget range in mind?"},
+            {"role": "buyer", "text": "Somewhere between $500,000 and $700,000."}
+        ]
+    },
+    {
+        "conversation_id": 3,
+        "messages": [
+            {"role": "agent", "text": "Hi there! Are you looking for a condo or a house?"},
+            {"role": "buyer", "text": "I'm looking for a modern condo in the city center."},
+            {"role": "agent", "text": "Do you have a preferred number of bedrooms or bathrooms?"},
+            {"role": "buyer", "text": "Just 1 bedroom and 1 bathroom is fine."},
+            {"role": "agent", "text": "What features are most important to you?"},
+            {"role": "buyer", "text": "I’d like an open layout, a balcony, and access to a gym."},
+            {"role": "agent", "text": "How important is public transportation to you?"},
+            {"role": "buyer", "text": "Very important; I want to be walking distance from the subway and bus stops."},
+            {"role": "agent", "text": "Do you have a preferred budget for the condo?"},
+            {"role": "buyer", "text": "Up to $350,000 would be ideal."},
+            {"role": "agent", "text": "Would you like any nearby amenities like cafes or grocery stores?"},
+            {"role": "buyer", "text": "Yes, I’d love to be close to coffee shops and a grocery store."}
+        ]
+    },
+    {
+        "conversation_id": 99,
+        "messages": [
+            {"role": "buyer", "text": "Hi, I am looking for a 3-bedroom house."},
+            {"role": "agent", "text": "Sure! What area are you interested in?"},
+            {"role": "buyer", "text": "Somewhere close to good schools and parks."},
+            {"role": "agent", "text": "Great, I have a few listings in mind."}
+        ]
+    },
+    {
+        "conversation_id": 100,
+        "messages": [
+            {"role": "buyer", "text": "I prefer a modern condo downtown."},
+            {"role": "agent", "text": "Understood. What is your budget?"}
+        ]
+    }
+]
