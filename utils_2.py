@@ -46,7 +46,7 @@ class BuyerPreferences(BaseModel):
 
 class RealEstateConversations:
 
-    # TODO: decouple logic to avoid error!!
+    # TODO: decouple logic to avoid error!!!
     QUERY_TEXT_TEMPLATE = (
         "- Property type: {property_type}\n"
         "- Amenities: {', '.join({amenities}) if {amenities} else 'Any'}\n"
