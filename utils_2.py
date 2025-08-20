@@ -44,37 +44,31 @@ class BuyerPreferences(BaseModel):
 
 
 
-current_dir = Path.cwd()
-conv_json_path = current_dir / "conversations.json"
+class RealEstateConversations:
 
-id = 2
-
-
-
-class RealEstateConversastions:
-
+    # TODO: decouple logic to avoid error!!
     QUERY_TEXT_TEMPLATE = (
         "- Property type: {property_type}\n"
         "- Amenities: {', '.join({amenities}) if {amenities} else 'Any'}\n"
         "- Furnished: {'Yes' if {furnished} else 'No'}\n"
-        "- Location: {{location} or 'Any'}\n"
+        "- Location: {{location or 'Any'}}\n"
         "- Neighborhood features: {', '.join({neighborhood_features}) if {neighborhood_features} else 'Any'}\n"
         "- Transportation preferences: {', '.join({transportation}) if {transportation} else 'Any'}\n"
         "- Parking required: {'Yes' if {parking_required} else 'No'}\n"
         "- Pet friendly required: {'Yes' if {pet_friendly_required} else 'No'}"
     )
 
-    def __init__(self, verbose=False):
+    def __init__(self, conv_json_path: Path, verbose=False):
 
         self.verbose = verbose
         self.client = OpenAI(base_url=OPENAI_API_BASE, api_key=OPENAI_API_KEY)
 
-        self.conversations = self.load_conversations()
+        self.conversations = self.load_conversations(conv_json_path)
         self.conv_ids = self.get_conv_ids()
 
 
     @staticmethod
-    def load_conversations(conv_json_path: Path, id_key="conversation_id"):
+    def load_conversations(conv_json_path: Path, id_key="conversation_id") -> dict:
         
         with conv_json_path.open("r", encoding="utf-8") as f:
             conversation_list = json.load(f)
@@ -89,7 +83,7 @@ class RealEstateConversastions:
         return conv_ids
 
 
-    def get_conversation_str(self, conv_id: int):
+    def _get_conversation_str(self, conv_id: int):
 
         assert conv_id in self.conv_ids, "invalid conversation id"
         conv = self.conversations[conv_id]
@@ -106,9 +100,7 @@ class RealEstateConversastions:
         return conversation_text
     
 
-    def get_buyer_preferences(self, conv_id: int):
-        
-        conversation_text = self.get_conversation_str(self, conv_id)
+    def _extract_preferences(self, conversation_text: str):
 
         system_prompt = "You are a real estate preference parser."
         user_prompt = f"Extract buyer preferences from the conversation below and fill the JSON fields:\n{conversation_text}"
@@ -130,14 +122,14 @@ class RealEstateConversastions:
         return BuyerPreferences(**content_dict)
     
 
-    def get_query_text(self, prefs: BuyerPreferences):
+    def _get_query_text(self, prefs: BuyerPreferences):
         
         buyer_preferences = prefs.model_dump()
         query_text = self.QUERY_TEXT_TEMPLATE.format(**buyer_preferences)
         return query_text
     
 
-    def get_conditions(self, prefs: BuyerPreferences):
+    def _get_conditions(self, prefs: BuyerPreferences):
 
         # Get the current date and time, and then extract the year attribute
         current_year = datetime.now().year
@@ -169,5 +161,14 @@ class RealEstateConversastions:
             conditions += [{"year_built": {"$gte": current_year - prefs.building_max_age}}]
 
         return conditions
+    
+
+    def get_query_and_conditions(self, conv_id: int):
+
+        conversation_text = self._get_conversation_str(conv_id)
+        buyer_prefs = self._extract_preferences(conversation_text)
+        query_text = self._get_query_text(buyer_prefs)
+        conditions = self._get_conditions(buyer_prefs)
+        return query_text, conditions
     
 

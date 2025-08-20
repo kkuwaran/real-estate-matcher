@@ -53,33 +53,41 @@ class Database:
             tenant=DEFAULT_TENANT,
             database=DEFAULT_DATABASE,
         )
-        self.collection_name = collection_name
         self.verbose = verbose
 
         if delete_flag:
-            self.delete_collection()
+            self.delete_collection(collection_name)
 
-        self.collection = self.get_collection()
+        self.collection = self.get_collection(collection_name)
         self.count()
 
-
-    def get_collection(self):
-        # Create a collection or get an existing one
+    
+    def _get_collection_names(self):
         collection_names = [c.name for c in self.client.list_collections()]
-        print("collection_names:", collection_names)
+        if self.verbose:
+            print("collection_names:", collection_names)
+        return collection_names
 
-        if self.collection_name in collection_names:
-            print(f"Get '{self.collection_name}' collection")
-            collection = self.client.get_collection(self.collection_name)
+
+    def get_collection(self, collection_name: str):
+        # Create a collection or get an existing one
+        collection_names = self._get_collection_names()
+
+        if collection_name in collection_names:
+            print(f"*** Get '{collection_name}' collection ***")
+            collection = self.client.get_collection(collection_name)
         else:
-            print(f"Create '{self.collection_name}' collection")
-            collection = self.client.create_collection(self.collection_name)
+            print(f"*** Create '{collection_name}' collection ***")
+            collection = self.client.create_collection(collection_name)
         
         return collection
     
-    def delete_collection(self):
+
+    def delete_collection(self, collection_name: str):
         # Delete a collection
-        self.client.delete_collection(self.collection_name)
+        print(f"*** Delete '{collection_name}' collection ***")
+        self.client.delete_collection(collection_name)
+
 
     def count(self):
         # Check how many items are inside
@@ -88,8 +96,7 @@ class Database:
         return num_items
     
 
-
-    def setup_embedding_function(self, openai_model_name="text-embedding-3-small"):
+    def _setup_embedding_function(self, openai_model_name="text-embedding-3-small"):
 
         # Setup embedding function
         # https://platform.openai.com/docs/guides/embeddings/embedding-models
@@ -110,7 +117,7 @@ class Database:
         print("No. of data:", len(real_estate_listings))
 
         if embed_model:
-            self.setup_embedding_function(openai_model_name=embed_model)
+            self._setup_embedding_function(openai_model_name=embed_model)
 
         ids = [str(listing["id"]) for listing in real_estate_listings]
 
@@ -146,7 +153,7 @@ class Database:
         return query_outputs
 
 
-    def display_real_estate_info(self, real_estate_id):
+    def _display_real_estate_info(self, real_estate_id):
 
         id_str = str(real_estate_id)
         item = self.collection.get(ids=[id_str])
@@ -164,6 +171,6 @@ class Database:
         while index < min(len(ids), n_heads):
             id_str = ids[index]
             print("*" * 20, f"Rank-{index + 1}", "*" * 20)
-            self.display_real_estate_info(id_str)
-            print("*" * 50)
+            self._display_real_estate_info(id_str)
+            print()
             index += 1
