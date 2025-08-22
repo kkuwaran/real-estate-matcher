@@ -68,6 +68,7 @@ class Database:
     # ===============================
     # Private helpers
     # ===============================
+    
     def _get_collection_names(self) -> List[str]:
         """Return all available collection names."""
 
@@ -93,6 +94,7 @@ class Database:
     # ===============================
     # Public methods
     # ===============================
+
     def get_collection(self, collection_name: str):
         """Retrieve or create a collection by name."""
 
