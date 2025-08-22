@@ -9,6 +9,8 @@ import chromadb
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 from chromadb.utils import embedding_functions
 
+from utils_3 import show_section
+
 
 # Load variables from .env into environment
 load_dotenv()
@@ -134,10 +136,7 @@ class Database:
             documents=documents,
             metadatas=metadatas,
         )
-
         self.count()
-
-        # print(f"Inserted {len(documents)} listings into Chroma collection '{self.collection_name}'")
 
 
     def query_db(self, query_text: str, conditions: list, n_results: int = 1):
@@ -149,11 +148,12 @@ class Database:
         )
 
         if self.verbose:
-            display(query_outputs)
+            show_section("Query Outputs", query_outputs, use_display=True)
+
         return query_outputs
 
 
-    def _display_real_estate_info(self, real_estate_id):
+    def _get_real_estate_info(self, real_estate_id):
 
         id_str = str(real_estate_id)
         item = self.collection.get(ids=[id_str])
@@ -161,16 +161,15 @@ class Database:
         metadata = item['metadatas'][0]
 
         real_estate_info = self.REAL_ESTATE_INFO_TEMPLATE.format(**metadata)
-        print(real_estate_info)
+        return real_estate_info
 
 
     def display_query_outputs(self, query_outputs, n_heads: int = 1):
 
-        ids = query_outputs['ids']
+        ids = query_outputs['ids'][0]
         index = 0
         while index < min(len(ids), n_heads):
             id_str = ids[index]
-            print("*" * 20, f"Rank-{index + 1}", "*" * 20)
-            self._display_real_estate_info(id_str)
-            print()
+            real_estate_info = self._get_real_estate_info(id_str)
+            show_section(f"Rank-{index + 1}", real_estate_info)
             index += 1

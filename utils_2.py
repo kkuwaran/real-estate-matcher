@@ -9,6 +9,8 @@ from pydantic import BaseModel
 
 from openai import OpenAI
 
+from utils_3 import show_section
+
 
 # Load variables from .env into environment
 load_dotenv()
@@ -46,16 +48,15 @@ class BuyerPreferences(BaseModel):
 
 class RealEstateConversations:
 
-    # TODO: decouple logic to avoid error!!!
     QUERY_TEXT_TEMPLATE = (
         "- Property type: {property_type}\n"
-        "- Amenities: {', '.join({amenities}) if {amenities} else 'Any'}\n"
-        "- Furnished: {'Yes' if {furnished} else 'No'}\n"
-        "- Location: {{location or 'Any'}}\n"
-        "- Neighborhood features: {', '.join({neighborhood_features}) if {neighborhood_features} else 'Any'}\n"
-        "- Transportation preferences: {', '.join({transportation}) if {transportation} else 'Any'}\n"
-        "- Parking required: {'Yes' if {parking_required} else 'No'}\n"
-        "- Pet friendly required: {'Yes' if {pet_friendly_required} else 'No'}"
+        "- Amenities: {amenities}\n"
+        "- Furnished: {furnished}\n"
+        "- Location: {location}\n"
+        "- Neighborhood features: {neighborhood_features}\n"
+        "- Transportation preferences: {transportation}\n"
+        "- Parking required: {parking_required}\n"
+        "- Pet friendly required: {pet_friendly_required}"
     )
 
     def __init__(self, conv_json_path: Path, verbose=False):
@@ -94,8 +95,7 @@ class RealEstateConversations:
             conversation_text += f"{role}: {msg['text']}\n"
 
         if self.verbose:
-            print(f"========== Conversation {conv_id} ==========")
-            print(conversation_text)
+            show_section(f"Conversation {conv_id}", conversation_text)
 
         return conversation_text
     
@@ -118,14 +118,38 @@ class RealEstateConversations:
         content_dict = json.loads(content)
 
         if self.verbose:
-            display(content_dict)
+            show_section("Buyer Preferences", content_dict, use_display=True)
+
         return BuyerPreferences(**content_dict)
     
 
-    def _get_query_text(self, prefs: BuyerPreferences):
+    def yes_no(self, value: bool) -> str:
+        return "Yes" if value else "No"
+
+
+    def join_or_any(self, values: list[str]) -> str:
+        return ", ".join(values) if values else "Any"
+    
+
+    def _get_query_text(self, prefs: BuyerPreferences) -> str:
         
         buyer_preferences = prefs.model_dump()
-        query_text = self.QUERY_TEXT_TEMPLATE.format(**buyer_preferences)
+        values = {
+            "property_type": buyer_preferences["property_type"],
+            "amenities": self.join_or_any(buyer_preferences["amenities"]),
+            "furnished": self.yes_no(buyer_preferences["furnished"]),
+            "location": buyer_preferences["location"] or "Any",
+            "neighborhood_features": self.join_or_any(buyer_preferences["neighborhood_features"]),
+            "transportation": self.join_or_any(buyer_preferences["transportation"]),
+            "parking_required": self.yes_no(buyer_preferences["parking_required"]),
+            "pet_friendly_required": self.yes_no(buyer_preferences["pet_friendly_required"]),
+        }
+
+        query_text = self.QUERY_TEXT_TEMPLATE.format(**values)
+
+        if self.verbose:
+            show_section("Query Text", query_text)
+
         return query_text
     
 
@@ -159,6 +183,9 @@ class RealEstateConversations:
             conditions += [{"year_built": {"$gte": prefs.building_min_year}}]
         if prefs.building_max_age:
             conditions += [{"year_built": {"$gte": current_year - prefs.building_max_age}}]
+
+        if self.verbose:
+            show_section("Filter Conditions", conditions, use_display=True)
 
         return conditions
     
