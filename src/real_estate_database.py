@@ -10,7 +10,7 @@ from chromadb.api.types import Documents
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 from chromadb.utils import embedding_functions
 
-from utils_3 import show_section
+from utility import show_section
 
 
 # Load variables from .env into environment

@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from openai import OpenAI
 
-from utils_3 import show_section
+from utility import show_section
 
 
 # Load variables from .env into environment
