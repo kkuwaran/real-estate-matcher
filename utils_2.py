@@ -4,8 +4,7 @@ from datetime import datetime
 import json
 from dotenv import load_dotenv
 from pathlib import Path
-from IPython.display import display
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from openai import OpenAI
 
@@ -21,32 +20,43 @@ OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 
 
 class BuyerPreferences(BaseModel):
-    bedrooms: Optional[int]
-    bathrooms: Optional[float]
-    property_type: Optional[str]
+    """A Pydantic model representing buyer preferences for real estate properties."""
+
+    bedrooms: Optional[int] = None   # number of bedrooms
+    bathrooms: Optional[float] = None  # number of bathrooms (can be fractional, e.g., 1.5)
+    property_type: Optional[str] = None  # e.g., "apartment", "condo", "house"
 
     # Additional physical features
-    area_min_sqft: Optional[int]   # minimum area (sq. ft)
-    area_max_sqft: Optional[int]   # maximum area (sq. ft)
-    building_max_age: Optional[int]  # max age in years
-    building_min_year: Optional[int] # alternatively, built after year X
+    area_min_sqft: Optional[int] = None   # minimum area (sq. ft)
+    area_max_sqft: Optional[int] = None   # maximum area (sq. ft)
+    building_max_age: Optional[int] = None  # maximum building age in years
+    building_min_year: Optional[int] = None  # alternatively, built after year X
     
     # Lifestyle & location
-    amenities: List[str] = []
-    furnished: bool = False
-    location: Optional[str]
-    neighborhood_features: List[str] = []
-    transportation: List[str] = []
-    parking_required: bool = False
-    pet_friendly_required: bool = False
+    amenities: List[str] = Field(default_factory=list)  # e.g., ["pool", "gym", "garden"]
+    furnished: bool = False                             # whether furnished is required
+    location: Optional[str] = None                      # general location string (e.g., city or district)
+    neighborhood_features: List[str] = Field(default_factory=list)  # e.g., ["quiet", "family-friendly"]
+    transportation: List[str] = Field(default_factory=list)         # e.g., ["near subway", "bus line access"]
+    parking_required: bool = False                      # parking requirement
+    pet_friendly_required: bool = False                 # must allow pets
 
     # Financial
-    min_budget: Optional[int]
-    max_budget: Optional[int]
+    min_budget: Optional[int] = None   # minimum budget in USD (or local currency)
+    max_budget: Optional[int] = None   # maximum budget in USD (or local currency)
 
 
 
 class RealEstateConversations:
+    """
+    Manages real estate buyer-seller conversations and extracts buyer preferences
+    using an LLM (OpenAI chat model).
+
+    This class:
+      - Loads conversation data from JSON
+      - Provides access to conversation IDs and text
+      - Extracts buyer preferences from conversations into a structured model
+    """
 
     QUERY_TEXT_TEMPLATE = (
         "- Property type: {property_type}\n"
