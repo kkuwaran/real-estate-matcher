@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from openai import OpenAI
 
+from real_estate_database import Database
 from utility import show_section
 
 
@@ -68,6 +69,14 @@ class RealEstateConversations:
         "- Parking required: {parking_required}\n"
         "- Pet friendly required: {pet_friendly_required}"
     )
+
+    # Default condition relaxation settings
+    RELAXATION_CONFIG = {
+        "bathrooms_tolerance": 0.5,     # initial tolerance for bathrooms
+        "budget_pct": 0.15,             # per relaxation level
+        "area_sqft_delta": 200,         # sq.ft change per level
+        "max_building_relax_level": 2,  # max level to enforce year/age constraints
+    }
 
 
     def __init__(self, conv_json_path: Path, model="gpt-4o-2024-08-06", verbose: bool = False) -> None:
@@ -206,49 +215,136 @@ class RealEstateConversations:
         return query_text
     
 
-    def build_filter_conditions(self, prefs: BuyerPreferences) -> List[dict]:
+    def build_filter_conditions(self, prefs: BuyerPreferences, relaxation_level: int = 0) -> List[dict]:
         """Convert buyer preferences into a list of filter conditions for a structured query."""
 
         # Get the current date and time, and then extract the year attribute
         current_year = datetime.now().year
 
+        cfg = self.RELAXATION_CONFIG
         conditions = []
+
         if prefs.bedrooms is not None:
             conditions.append({"bedrooms": prefs.bedrooms})
+
         if prefs.bathrooms is not None:
-            # Allow +/-1 range for bathrooms
-            conditions.append({"bathrooms": {"$gte": prefs.bathrooms - 1}})
-            conditions.append({"bathrooms": {"$lte": prefs.bathrooms + 1}})
+            tol = cfg["bathrooms_tolerance"] + relaxation_level
+            conditions.append({"bathrooms": {"$gte": prefs.bathrooms - tol}})
+            conditions.append({"bathrooms": {"$lte": prefs.bathrooms + tol}})
+
         if prefs.min_budget is not None:
-            conditions.append({"price": {"$gte": prefs.min_budget}})
+            min_budget = int(prefs.min_budget * (1 - cfg["budget_pct"] * relaxation_level))
+            conditions.append({"price": {"$gte": min_budget}})
         if prefs.max_budget is not None:
-            conditions.append({"price": {"$lte": prefs.max_budget}})
+            max_budget = int(prefs.max_budget * (1 + cfg["budget_pct"] * relaxation_level))
+            conditions.append({"price": {"$lte": max_budget}})
+
         if prefs.area_min_sqft is not None:
-            conditions.append({"area_sqft": {"$gte": prefs.area_min_sqft}})
+            conditions.append({"area_sqft": {"$gte": max(0, prefs.area_min_sqft - cfg["area_sqft_delta"] * relaxation_level)}})
         if prefs.area_max_sqft is not None:
-            conditions.append({"area_sqft": {"$lte": prefs.area_max_sqft}})
-        if prefs.building_min_year is not None:
+            conditions.append({"area_sqft": {"$lte": prefs.area_max_sqft + cfg["area_sqft_delta"] * relaxation_level}})
+
+        if prefs.building_min_year is not None and relaxation_level < cfg["max_building_relax_level"]:
             conditions.append({"year_built": {"$gte": prefs.building_min_year}})
-        if prefs.building_max_age is not None:
-            # Convert max building age to minimum construction year
+        if prefs.building_max_age is not None and relaxation_level < cfg["max_building_relax_level"]:
             conditions.append({"year_built": {"$gte": current_year - prefs.building_max_age}})
 
-        if self.verbose:
-            show_section("Filter Conditions", conditions, use_display=True)
-
         return conditions
+
+        # # Get the current date and time, and then extract the year attribute
+        # current_year = datetime.now().year
+
+        # conditions = []
+        # if prefs.bedrooms is not None:
+        #     conditions.append({"bedrooms": prefs.bedrooms})
+        # if prefs.bathrooms is not None:
+        #     # Allow +/-1 range for bathrooms
+        #     conditions.append({"bathrooms": {"$gte": prefs.bathrooms - 1}})
+        #     conditions.append({"bathrooms": {"$lte": prefs.bathrooms + 1}})
+        # if prefs.min_budget is not None:
+        #     conditions.append({"price": {"$gte": prefs.min_budget}})
+        # if prefs.max_budget is not None:
+        #     conditions.append({"price": {"$lte": prefs.max_budget}})
+        # if prefs.area_min_sqft is not None:
+        #     conditions.append({"area_sqft": {"$gte": prefs.area_min_sqft}})
+        # if prefs.area_max_sqft is not None:
+        #     conditions.append({"area_sqft": {"$lte": prefs.area_max_sqft}})
+        # if prefs.building_min_year is not None:
+        #     conditions.append({"year_built": {"$gte": prefs.building_min_year}})
+        # if prefs.building_max_age is not None:
+        #     # Convert max building age to minimum construction year
+        #     conditions.append({"year_built": {"$gte": current_year - prefs.building_max_age}})
+
+        # if self.verbose:
+        #     show_section("Filter Conditions", conditions, use_display=True)
+
+        # return conditions
     
 
-    def get_query_text_and_conditions(self, conv_id: int) -> Tuple[str, List[dict]]:
+    # def get_query_text_and_conditions(self, conv_id: int) -> Tuple[str, List[dict]]:
+    #     """
+    #     Given a conversation ID, extract buyer preferences and generate both:
+    #     - Query text for semantic search
+    #     - Filter conditions for structured query
+    #     """
+
+    #     buyer_prefs = self.extract_preferences(conv_id)
+
+    #     query_text = self.build_query_text(buyer_prefs)
+    #     conditions = self.build_filter_conditions(buyer_prefs)
+
+    #     return query_text, conditions
+    
+
+
+
+    def query_with_progressive_relaxation(
+        self,
+        conv_id: int,
+        database: Database,
+        n_results: int = 3,
+        max_relaxation_level: int = 5,
+    ) -> List[str]:
         """
-        Given a conversation ID, extract buyer preferences and generate both:
-        - Query text for semantic search
-        - Filter conditions for structured query
+        Perform a semantic + structured database query based on buyer preferences,
+        progressively relaxing filter conditions until enough results are found.
+
+        Args:
+            conv_id (int): ID of the conversation from which to extract buyer preferences.
+            database (Database): Instance of the Database class to query.
+            n_results (int, optional): Minimum number of results to return. Defaults to 3.
+            max_relaxation_level (int, optional): Maximum number of relaxation iterations. Defaults to 5.
+
+        Returns:
+            List[str]: List of real estate IDs matching the query.
+                    Returns an empty list if preferences cannot be extracted or no matches are found.
         """
 
+        # Extract buyer preferences from conversation
         buyer_prefs = self.extract_preferences(conv_id)
+        if buyer_prefs is None:
+            show_section("Error", "Failed to extract buyer preferences from conversation.")
+            return []
 
+        # Build the query text for semantic search
         query_text = self.build_query_text(buyer_prefs)
-        conditions = self.build_filter_conditions(buyer_prefs)
 
-        return query_text, conditions
+        ids = []
+
+        # Progressive relaxation loop
+        for level in range(max_relaxation_level + 1):
+            print("=" * 35, f"\nRelaxation Level {level}: Querying ...")
+
+            # Build structured filters and perform database query
+            conditions = self.build_filter_conditions(buyer_prefs, relaxation_level=level)
+            query_outputs = database.query(query_text, conditions, n_results=n_results)
+
+            # Check if at least n_results were found
+            ids = database.extract_ids_from_query_outputs(query_outputs)
+            if len(ids) >= n_results:
+                break  # Stop relaxing once we have enough results
+
+        # Display the query results
+        database.display_results_from_ids(ids, n_heads=n_results)
+
+        return ids

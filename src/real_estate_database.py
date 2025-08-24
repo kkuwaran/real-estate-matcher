@@ -179,16 +179,47 @@ class Database:
         # Use predefined template to render information
         real_estate_info = self.REAL_ESTATE_INFO_TEMPLATE.format(**metadata)
         return real_estate_info
+    
 
-
-    def display_results(self, query_outputs: Dict[str, Any], n_heads: int = 1) -> None:
+    @staticmethod
+    def extract_ids_from_query_outputs(query_outputs: Dict[str, Any]) -> List[str]:
         """
-        Display top-ranked query results with formatted real estate information.
-            - query_outputs (Dict[str, Any]): Results from the `query` method.
-            - n_heads (int, optional): Number of top-ranked results to display. Defaults to 1.
+        Safely extract a list of real estate IDs from query outputs.
+        Returns an empty list if no results are found.
         """
 
-        ids = query_outputs.get("ids", [[]])[0]  # Safely extract list of IDs
+        ids_list = query_outputs.get("ids", [[]])
+        if not ids_list or not ids_list[0]:
+            return []
+        return ids_list[0]
+    
+
+    def display_results_from_ids(self, ids: List[str], n_heads: int = 1) -> None:
+        """Display top-ranked real estate information given a list of IDs."""
+
+        if not ids:
+            show_section("Query Results", "No results found.")
+            return
+
         for rank, real_estate_id in enumerate(ids[:n_heads], start=1):
             real_estate_info = self.fetch_real_estate_info(real_estate_id)
             show_section(f"Rank-{rank}", real_estate_info)
+
+
+    # def display_results(self, query_outputs: Dict[str, Any], n_heads: int = 1) -> None:
+    #     """
+    #     Display top-ranked query results with formatted real estate information.
+    #         - query_outputs (Dict[str, Any]): Results from the `query` method.
+    #         - n_heads (int, optional): Number of top-ranked results to display. Defaults to 1.
+    #     """
+
+    #     # Safely extract list of IDs
+    #     ids_list = query_outputs.get("ids", [[]])
+    #     if not ids_list or not ids_list[0]:
+    #         show_section("Query Results", "No results found.")
+    #         return
+
+    #     ids = ids_list[0]
+    #     for rank, real_estate_id in enumerate(ids[:n_heads], start=1):
+    #         real_estate_info = self.fetch_real_estate_info(real_estate_id)
+    #         show_section(f"Rank-{rank}", real_estate_info)
