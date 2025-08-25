@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Dict, Any
+from datetime import date
 from IPython.display import display
 
 
@@ -19,3 +20,15 @@ def show_section(
         print(content)
 
     print()  # extra newline
+
+
+def serialize_dates(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert any datetime.date objects in the dictionary to ISO-formatted strings."""
+
+    serialized = {}
+    for key, value in data.items():
+        if isinstance(value, date):
+            serialized[key] = value.isoformat()  # "YYYY-MM-DD"
+        else:
+            serialized[key] = value
+    return serialized

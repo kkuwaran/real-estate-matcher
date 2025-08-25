@@ -453,5 +453,53 @@
         "id": 31,
         "title": "New Cozy House",
         "price": 450000
+    },
+    {
+        "id": 32,
+        "title": "Charming 3-Bedroom Family Home with Garden",
+        "description": "This beautifully maintained 3-bedroom, 2-bathroom home offers a spacious layout and a serene garden perfect for family gatherings.",
+        "neighborhood_description": "Nestled in a quiet suburban area, this home is just a short drive from local schools, parks, and shopping centers.",
+        "city": "Austin",
+        "state": "TX",
+        "neighborhood": "Southwest Austin",
+        "property_type": "Single Family Home",
+        "year_built": 2015,
+        "price": 425000.0,
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "area_sqft": 1800,
+        "listed_date": "2025-03-15"
+    },
+    {
+        "id": 33,
+        "title": "Charming 3-Bedroom House with Garden",
+        "description": "This delightful 3-bedroom, 2-bathroom house features a spacious layout with modern finishes and a lovely garden for outdoor enjoyment.",
+        "neighborhood_description": "Nestled in a quiet suburban area, this home offers easy access to local parks, shopping centers, and top-rated schools.",
+        "city": "Austin",
+        "state": "TX",
+        "neighborhood": "Westlake",
+        "property_type": "House",
+        "year_built": 2015,
+        "price": 475000.0,
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "area_sqft": 1800,
+        "listed_date": "2025-05-15"
+    },
+    {
+        "id": 34,
+        "title": "Spacious 3-Bedroom Family Home with Garden",
+        "description": "This beautiful 3-bedroom, 2-bathroom home features a spacious layout, perfect for families. The open-concept living area flows seamlessly into a modern kitchen equipped with stainless steel appliances.",
+        "neighborhood_description": "Nestled in a quiet residential area with tree-lined streets, this home is just a short walk from local parks and schools. Enjoy the community feel while being close to city amenities.",
+        "city": "Austin",
+        "state": "TX",
+        "neighborhood": "Northwest Hills",
+        "property_type": "Single Family Home",
+        "year_built": 2015,
+        "price": 450000.0,
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "area_sqft": 1800,
+        "listed_date": "2025-04-01"
     }
 ]
