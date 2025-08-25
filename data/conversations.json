@@ -47,19 +47,48 @@
         ]
     },
     {
-        "conversation_id": 99,
+        "conversation_id": 4,
         "messages": [
-            {"role": "buyer", "text": "Hi, I am looking for a 3-bedroom house."},
-            {"role": "agent", "text": "Sure! What area are you interested in?"},
-            {"role": "buyer", "text": "Somewhere close to good schools and parks."},
-            {"role": "agent", "text": "Great, I have a few listings in mind."}
+            {"role": "agent", "text": "Hello! Are you looking for an apartment, house, or something else?"},
+            {"role": "buyer", "text": "I want a cozy townhouse near the downtown area."},
+            {"role": "agent", "text": "How many bedrooms and bathrooms do you need?"},
+            {"role": "buyer", "text": "2 bedrooms and 2 bathrooms should be enough."},
+            {"role": "agent", "text": "Any particular features or amenities you want?"},
+            {"role": "buyer", "text": "I’d like a rooftop terrace and in-unit laundry."},
+            {"role": "agent", "text": "Are schools or safety a priority for you?"},
+            {"role": "buyer", "text": "Not a big concern, but a quiet neighborhood would be nice."},
+            {"role": "agent", "text": "What about your budget?"},
+            {"role": "buyer", "text": "Somewhere between $400,000 and $500,000."}
         ]
     },
     {
-        "conversation_id": 100,
+        "conversation_id": 5,
         "messages": [
-            {"role": "buyer", "text": "I prefer a modern condo downtown."},
-            {"role": "agent", "text": "Understood. What is your budget?"}
+            {"role": "agent", "text": "Hi! What kind of property are you interested in?"},
+            {"role": "buyer", "text": "I’m looking for a luxury villa with a lot of space."},
+            {"role": "agent", "text": "How many bedrooms and bathrooms do you prefer?"},
+            {"role": "buyer", "text": "At least 5 bedrooms and 4 bathrooms."},
+            {"role": "agent", "text": "Any must-have amenities?"},
+            {"role": "buyer", "text": "A swimming pool, home theater, and large garden."},
+            {"role": "agent", "text": "Do you have a preferred location or neighborhood?"},
+            {"role": "buyer", "text": "Somewhere quiet but not too far from the city center."},
+            {"role": "agent", "text": "What’s your budget range?"},
+            {"role": "buyer", "text": "Above $1,000,000."}
+        ]
+    },
+    {
+        "conversation_id": 6,
+        "messages": [
+            {"role": "agent", "text": "Hello! Are you looking for a rental or a purchase?"},
+            {"role": "buyer", "text": "I’m looking to rent a small studio apartment."},
+            {"role": "agent", "text": "Any specific number of bedrooms or bathrooms?"},
+            {"role": "buyer", "text": "Just a studio, so 1 bathroom is fine."},
+            {"role": "agent", "text": "Do you have any preferences for amenities?"},
+            {"role": "buyer", "text": "I want a fully furnished place and a gym in the building."},
+            {"role": "agent", "text": "Is proximity to public transport important?"},
+            {"role": "buyer", "text": "Yes, I’d like to be within walking distance to the subway."},
+            {"role": "agent", "text": "What’s your monthly budget?"},
+            {"role": "buyer", "text": "Up to $1,800 per month."}
         ]
     }
 ]

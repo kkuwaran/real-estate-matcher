@@ -155,9 +155,16 @@ class Database:
             - n_results (int, optional): Number of results to return. Defaults to 1.
         """
 
+        if not conditions:
+            where_clause = None  # no filtering
+        elif len(conditions) == 1:
+            where_clause = conditions[0]  # single condition
+        else:
+            where_clause = {"$and": conditions}  # multiple conditions
+
         query_outputs = self.collection.query(
             query_texts=[query_text],
-            where={"$and": conditions},
+            where=where_clause,
             n_results=n_results,
         )
 
@@ -204,22 +211,3 @@ class Database:
         for rank, real_estate_id in enumerate(ids[:n_heads], start=1):
             real_estate_info = self.fetch_real_estate_info(real_estate_id)
             show_section(f"Rank-{rank}", real_estate_info)
-
-
-    # def display_results(self, query_outputs: Dict[str, Any], n_heads: int = 1) -> None:
-    #     """
-    #     Display top-ranked query results with formatted real estate information.
-    #         - query_outputs (Dict[str, Any]): Results from the `query` method.
-    #         - n_heads (int, optional): Number of top-ranked results to display. Defaults to 1.
-    #     """
-
-    #     # Safely extract list of IDs
-    #     ids_list = query_outputs.get("ids", [[]])
-    #     if not ids_list or not ids_list[0]:
-    #         show_section("Query Results", "No results found.")
-    #         return
-
-    #     ids = ids_list[0]
-    #     for rank, real_estate_id in enumerate(ids[:n_heads], start=1):
-    #         real_estate_info = self.fetch_real_estate_info(real_estate_id)
-    #         show_section(f"Rank-{rank}", real_estate_info)

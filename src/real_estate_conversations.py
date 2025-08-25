@@ -251,52 +251,6 @@ class RealEstateConversations:
 
         return conditions
 
-        # # Get the current date and time, and then extract the year attribute
-        # current_year = datetime.now().year
-
-        # conditions = []
-        # if prefs.bedrooms is not None:
-        #     conditions.append({"bedrooms": prefs.bedrooms})
-        # if prefs.bathrooms is not None:
-        #     # Allow +/-1 range for bathrooms
-        #     conditions.append({"bathrooms": {"$gte": prefs.bathrooms - 1}})
-        #     conditions.append({"bathrooms": {"$lte": prefs.bathrooms + 1}})
-        # if prefs.min_budget is not None:
-        #     conditions.append({"price": {"$gte": prefs.min_budget}})
-        # if prefs.max_budget is not None:
-        #     conditions.append({"price": {"$lte": prefs.max_budget}})
-        # if prefs.area_min_sqft is not None:
-        #     conditions.append({"area_sqft": {"$gte": prefs.area_min_sqft}})
-        # if prefs.area_max_sqft is not None:
-        #     conditions.append({"area_sqft": {"$lte": prefs.area_max_sqft}})
-        # if prefs.building_min_year is not None:
-        #     conditions.append({"year_built": {"$gte": prefs.building_min_year}})
-        # if prefs.building_max_age is not None:
-        #     # Convert max building age to minimum construction year
-        #     conditions.append({"year_built": {"$gte": current_year - prefs.building_max_age}})
-
-        # if self.verbose:
-        #     show_section("Filter Conditions", conditions, use_display=True)
-
-        # return conditions
-    
-
-    # def get_query_text_and_conditions(self, conv_id: int) -> Tuple[str, List[dict]]:
-    #     """
-    #     Given a conversation ID, extract buyer preferences and generate both:
-    #     - Query text for semantic search
-    #     - Filter conditions for structured query
-    #     """
-
-    #     buyer_prefs = self.extract_preferences(conv_id)
-
-    #     query_text = self.build_query_text(buyer_prefs)
-    #     conditions = self.build_filter_conditions(buyer_prefs)
-
-    #     return query_text, conditions
-    
-
-
 
     def query_with_progressive_relaxation(
         self,
