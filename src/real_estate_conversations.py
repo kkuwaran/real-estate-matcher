@@ -148,8 +148,8 @@ class RealEstateConversations:
             for msg in conv["messages"]
         )
 
-        if self.verbose:
-            show_section(f"Conversation {conv_id}", conversation_text)
+        # if self.verbose:
+        show_section(f"Conversation {conv_id}", conversation_text)
 
         return conversation_text
     
